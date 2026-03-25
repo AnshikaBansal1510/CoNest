@@ -150,7 +150,7 @@ const LandingPage = () => {
 
               {user ? (
                 <button
-                  onClick={handleLogout}
+                  //onClick={handleLogout}
                   className="border-2 border-purple-500 text-white bg-gradient-to-br from-purple-900 to-purple-700 px-6 py-2 rounded-lg hover:bg-purple-600 transition-all"
                 >
                   Logout
@@ -441,7 +441,9 @@ const LandingPage = () => {
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 70% 30%, rgba(245,158,11,0.15), transparent 60%)" }} />
           <h2 className="text-4xl md:text-5xl text-white font-black font-display mb-4 relative">Ready to Find Your Nest?</h2>
           <p className="text-gray-300 mb-8 relative">Join 50+ users who found their ideal living situation on CodeNest.</p>
-          <button onClick={() => navigate("auth", { authMode: "register" })}
+          <button 
+            //onClick={() => navigate("auth", { authMode: "register" })}
+            onClick={ e => openSignUp()}
             className="relative bg-gradient-to-r from-purple-400 to-purple-500 text-[#0A0F1E] font-bold text-lg px-10 py-4 rounded-full hover:bg-[#FBBF24] hover:scale-105 transition-all duration-200">
             Create Free Account →
           </button>

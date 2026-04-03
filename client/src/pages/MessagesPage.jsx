@@ -1,26 +1,44 @@
 import React, { useState } from "react";
+import { useParams } from 'react-router-dom'; 
+import { useEffect } from 'react'; 
 
 const conversations = [
-  { id: 1, name: "Kavya Sharma", avatar: "KS", lastMsg: "Sure, let's schedule a call!", time: "2m", unread: 2, online: true },
-  { id: 2, name: "Arjun Patel", avatar: "AP", lastMsg: "What's the nearest metro station?", time: "1h", unread: 0, online: false },
-  { id: 3, name: "Meera Iyer", avatar: "MI", lastMsg: "Looks great! Can I visit this weekend?", time: "3h", unread: 1, online: true },
-  { id: 4, name: "Dev Anand", avatar: "DA", lastMsg: "Is the wifi included in the rent?", time: "1d", unread: 0, online: false },
+  { id: 1, name: "Priya K.", avatar: "PK", lastMsg: "Is the room available?", time: "2m", unread: 0, online: true },
+  { id: 2, name: "Ravi M.", avatar: "RM", lastMsg: "I'll check the balcony.", time: "1h", unread: 0, online: false },
+  { id: 3, name: "Sneha T.", avatar: "ST", lastMsg: "Metro is very close!", time: "3h", unread: 1, online: true },
+  { id: 4, name: "Aarav P.", avatar: "AP", lastMsg: "Bike parking is free.", time: "1d", unread: 0, online: false },
+  { id: 5, name: "Nisha R.", avatar: "NR", lastMsg: "The gym is great here.", time: "5m", unread: 0, online: true },
+  { id: 6, name: "Karan V.", avatar: "KV", lastMsg: "Cook charges are extra.", time: "10m", unread: 0, online: false },
 ];
-
-const sampleMessages = [
-  { from: "them", text: "Hi! I saw your listing and I'm really interested.", time: "10:00 AM" },
-  { from: "me", text: "Hey Kavya! Thanks for reaching out. What would you like to know?", time: "10:05 AM" },
+const getMessagesFor = (name) => [
+  { from: "them", text: `Hi! I saw your listing for ${name} and I'm really interested.`, time: "10:00 AM" },
+  { from: "me", text: `Hey ${name}! Thanks for reaching out. What would you like to know?`, time: "10:05 AM" },
   { from: "them", text: "Is the room still available from next month?", time: "10:07 AM" },
-  { from: "me", text: "Yes, it's available from the 1st! The rent is ₹12,000/mo.", time: "10:09 AM" },
-  { from: "them", text: "Perfect! Can we schedule a visit this weekend?", time: "10:12 AM" },
-  { from: "me", text: "Absolutely! Saturday afternoon works for me.", time: "10:14 AM" },
-  { from: "them", text: "Sure, let's schedule a call!", time: "10:15 AM" },
+  { from: "me", text: "Yes, it's available from the 1st!", time: "10:09 AM" },
 ];
 
-export function MessagesPage({ navigate }) {
+export function MessagesPage() {
+   const { id } = useParams();
   const [activeConv, setActiveConv] = useState(conversations[0]);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState(sampleMessages);
+ 
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    if (id) {
+      // Find the conversation that matches the ID from the URL
+      const selected = conversations.find(c => c.id == id);
+      if (selected) {
+        setActiveConv(selected);
+        setMessages(getMessagesFor(selected.name.split(' ')[0]));
+      }
+    } else {
+        const defaultConv = conversations[0];
+        setActiveConv(defaultConv);
+        setMessages(getMessagesFor(defaultConv.name.split(' ')[0]));
+    }
+  }, [id]);
+  
 
   const send = (e) => {
     e.preventDefault();

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useProfile } from "../hooks/useProfile";
+import { useParams } from 'react-router-dom';
 
 // ── Skeleton ─────────────────────────────────────────────────
 function Skeleton({ className = "" }) {
@@ -13,7 +14,9 @@ const LIFESTYLE_OPTIONS = [
 ];
 
 const ProfilePage = () => {
-  const { profile, loading, saving, error, saveInfo, savePreferences, triggerVerify } = useProfile();
+  const {id}=useParams();
+  const { profile, loading, saving, error, saveInfo, savePreferences, triggerVerify } = useProfile(id);
+  
 
   const [activeTab, setActiveTab] = useState("info");
   const [saved, setSaved]         = useState(false);
@@ -127,9 +130,9 @@ const ProfilePage = () => {
           </div>
 
           <div className="flex-1">
-            <h1 className="text-2xl font-black text-white">{form.name || "Your Profile"}</h1>
+            <h1 className="text-2xl font-black text-white">{id ? profile?.name :(form.name || "Your Profile")}</h1>
             <p className="text-gray-400 text-sm">
-              {form.occupation || "—"} · {form.city || "—"}
+              {id ? profile?.occupation :(form.occupation || "—")} · {id ? profile?.city :(form.city || "—")}
             </p>
             <div className="flex gap-2 mt-2">
               <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-1 rounded-full border border-purple-500/30">
@@ -137,10 +140,12 @@ const ProfilePage = () => {
               </span>
             </div>
           </div>
-
-          <button className="text-xs bg-white/5 border border-white/10 px-4 py-2 rounded-xl hover:bg-white/10 transition-all">
+{!id &&(
+   <button className="text-xs bg-white/5 border border-white/10 px-4 py-2 rounded-xl hover:bg-white/10 transition-all">
             Change Photo
           </button>
+        )}
+         
         </div>
 
         {/* ── Tabs ───────────────────────────────────────── */}
@@ -178,6 +183,7 @@ const ProfilePage = () => {
                   <input
                     type={f.type}
                     value={form[f.key]}
+                    readOnly={!!id}
                     onChange={(e) => setForm((p) => ({ ...p, [f.key]: e.target.value }))}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500"
                   />
@@ -189,13 +195,13 @@ const ProfilePage = () => {
                 <textarea
                   rows={3}
                   value={form.bio}
+                  readOnly={!!id}
                   onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500 resize-none"
                 />
               </div>
             </div>
-
-            <button
+{!id && (<button
               onClick={handleSaveInfo}
               disabled={saving}
               className={`mt-4 px-8 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${
@@ -205,7 +211,8 @@ const ProfilePage = () => {
               }`}
             >
               {saving ? "Saving…" : saved ? "✓ Saved!" : "Save Changes"}
-            </button>
+            </button>)}
+            
           </div>
         )}
 
@@ -222,11 +229,12 @@ const ProfilePage = () => {
                 {LIFESTYLE_OPTIONS.map((tag) => (
                   <button
                     key={tag}
-                    onClick={() => toggleLifestyle(tag)}
+                    onClick={() => !id && toggleLifestyle(tag)}
+                    disabled={!!id}
                     className={`px-4 py-2 rounded-full text-sm border transition-all ${
                       form.lifestyle.includes(tag)
                         ? "bg-purple-500/20 border-purple-500 text-purple-400"
-                        : "bg-white/5 border-white/10 text-gray-400 hover:border-purple-400"
+                        : "bg-white/5 border-white/10 text-gray-400 " + (!id ? "hover:border-purple-400" : "opacity-50 cursor-default")
                     }`}
                   >
                     {tag}
@@ -241,11 +249,12 @@ const ProfilePage = () => {
                 {["Any", "Male", "Female"].map((g) => (
                   <button
                     key={g}
-                    onClick={() => setForm((p) => ({ ...p, genderPref: g }))}
+                    onClick={() => !id && setForm((p) => ({ ...p, genderPref: g }))}
+                    disabled={!!id}
                     className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${
                       form.genderPref === g
                         ? "bg-purple-500/10 border-purple-500 text-purple-400"
-                        : "bg-white/5 border-white/10 text-gray-400"
+                        : "bg-white/5 border-white/10 text-gray-400 " + (!id ? "" : "opacity-50 cursor-default")
                     }`}
                   >
                     {g}
@@ -254,17 +263,19 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <button
-              onClick={handleSavePreferences}
-              disabled={saving}
-              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${
-                saved
-                  ? "bg-green-500 text-white"
-                  : "bg-purple-600 hover:bg-purple-700 text-white"
-              }`}
-            >
-              {saving ? "Saving…" : saved ? "✓ Saved!" : "Save Preferences"}
-            </button>
+            {!id && (
+              <button
+                onClick={handleSavePreferences}
+                disabled={saving}
+                className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${
+                  saved
+                    ? "bg-green-500 text-white"
+                    : "bg-purple-600 hover:bg-purple-700 text-white"
+                }`}
+              >
+                {saving ? "Saving…" : saved ? "✓ Saved!" : "Save Preferences"}
+              </button>
+            )}
           </div>
         )}
 
@@ -288,13 +299,15 @@ const ProfilePage = () => {
                     ✓ Verified
                   </span>
                 ) : (
-                  <button
-                    onClick={() => triggerVerify(v.key)}
-                    disabled={saving}
-                    className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full hover:bg-purple-500/20 disabled:opacity-50"
-                  >
-                    Verify Now
-                  </button>
+                  !id && (
+                    <button
+                      onClick={() => triggerVerify(v.key)}
+                      disabled={saving}
+                      className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full hover:bg-purple-500/20 disabled:opacity-50"
+                    >
+                      Verify Now
+                    </button>
+                  )
                 )}
               </div>
             ))}

@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/react";
 
 const API = import.meta.env.VITE_API_URL;
 
-export function useProfile() {
+export function useProfile(userId) {
   const { getToken } = useAuth();
 
   const [profile, setProfile]   = useState(null);
@@ -17,7 +17,8 @@ export function useProfile() {
       setLoading(true);
       setError(null);
       const token = await getToken();
-      const res = await fetch(`${API}/api/profile`, {
+      const endpoint = userId ? `${API}/api/users/${userId}` : `${API}/api/profile`;
+      const res = await fetch(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error((await res.json()).error || "Fetch failed");
@@ -27,7 +28,7 @@ export function useProfile() {
     } finally {
       setLoading(false);
     }
-  }, [getToken]);
+  }, [getToken, userId]);
 
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
 

@@ -1,18 +1,22 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+
 
 const allListings = [
   { id: 1, name: "Priya K.", title: "Cozy Room in Koramangala", city: "Bangalore", area: "Koramangala", rent: 12000, gender: "Female", occupation: "IT Professional", tags: ["AC", "WiFi", "Gym", "Vegetarian"], score: 91, avatar: "PK", verified: true, furnished: "Fully" },
   { id: 2, name: "Ravi M.", title: "Spacious 2BHK in Bandra", city: "Mumbai", area: "Bandra West", rent: 22000, gender: "Any", occupation: "Finance", tags: ["Sea View", "Parking", "Balcony"], score: 84, avatar: "RM", verified: true, furnished: "Semi" },
   { id: 3, name: "Sneha T.", title: "Studio Near Metro", city: "Delhi", area: "Lajpat Nagar", rent: 9500, gender: "Female", occupation: "Student", tags: ["Metro Access", "Quiet Area", "WiFi"], score: 77, avatar: "ST", verified: false, furnished: "Fully" },
   { id: 4, name: "Aarav P.", title: "Bright Room in Aundh", city: "Pune", area: "Aundh", rent: 8000, gender: "Male", occupation: "Student", tags: ["Bike Parking", "Gated", "Mess Nearby"], score: 73, avatar: "AP", verified: true, furnished: "Unfurnished" },
-  { id: 5, name: "Nisha R.", title: "Luxury Flat HSR Layout", city: "Bangalore", area: "HSR Layout", rent: 18000, gender: "Any", occupation: "Any", tags: ["Pool", "Gym", "24hr Security"], score: 88, avatar: "NR", verified: true, furnished: "Fully" },
+  { id: 5, name: "Nisha R.", title: "Luxury Flat HSR Layout", city: "Bangalore", area: "HSR Layout", rent: 18000, gender: "Female", occupation: "Any", tags: ["Pool", "Gym", "24hr Security"], score: 88, avatar: "NR", verified: true, furnished: "Fully" },
   { id: 6, name: "Karan V.", title: "Affordable in Kothrud", city: "Pune", area: "Kothrud", rent: 6500, gender: "Male", occupation: "IT Professional", tags: ["Near IT Park", "WiFi", "Cook"], score: 69, avatar: "KV", verified: false, furnished: "Semi" },
 ];
 
-export function SearchPage({ navigate }) {
+export function SearchPage() {
   const [filters, setFilters] = useState({ city: "", minRent: "", maxRent: "", gender: "", furnished: "", search: "" });
   const [sortBy, setSortBy] = useState("score");
   const [view, setView] = useState("grid");
+  const navigate = useNavigate();
 
   const updateFilter = (key, val) => setFilters(prev => ({ ...prev, [key]: val }));
 
@@ -53,11 +57,10 @@ export function SearchPage({ navigate }) {
               <button
                 key={v}
                 onClick={() => setView(v)}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                  view === v
+                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${view === v
                     ? "bg-purple-600 text-white"
                     : "text-gray-400 hover:text-white"
-                }`}
+                  }`}
               >
                 {v === "grid" ? "⊞" : "☰"}
               </button>
@@ -68,9 +71,9 @@ export function SearchPage({ navigate }) {
         {/* Filters */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 p-4 rounded-2xl bg-gray-900 border border-purple-500/20">
           {[
-            { key: "city", label: "City", options: ["", "Bangalore", "Mumbai", "Delhi", "Pune"] },
-            { key: "gender", label: "Gender", options: ["", "Any", "Male", "Female"] },
-            { key: "furnished", label: "Furnished", options: ["", "Fully", "Semi", "Unfurnished"] },
+            { key: "city", label: "City", allLabel: "All Cities", options: ["", "Bangalore", "Mumbai", "Delhi", "Pune"] },
+            { key: "gender", label: "Gender", allLabel: "All Genders", options: ["", "Any", "Male", "Female"] },
+            { key: "furnished", label: "Furnished", allLabel: "Any Furnishing", options: ["", "Fully", "Semi", "Unfurnished"] },
           ].map(f => (
             <div key={f.key}>
               <label className="block text-[10px] text-gray-400 mb-1">
@@ -83,7 +86,7 @@ export function SearchPage({ navigate }) {
               >
                 {f.options.map(o => (
                   <option key={o} value={o} className="bg-black">
-                    {o || `All ${f.label}s`}
+                    {o || f.allLabel}
                   </option>
                 ))}
               </select>
@@ -127,11 +130,10 @@ export function SearchPage({ navigate }) {
               <button
                 key={s}
                 onClick={() => setSortBy(s)}
-                className={`px-3 py-1 rounded-full transition-all ${
-                  sortBy === s
+                className={`px-3 py-1 rounded-full transition-all ${sortBy === s
                     ? "bg-purple-500/20 text-purple-400"
                     : "hover:text-white"
-                }`}
+                  }`}
               >
                 {s === "score" ? "Best Match" : "Lowest Rent"}
               </button>
@@ -140,10 +142,13 @@ export function SearchPage({ navigate }) {
         </div>
 
         {/* Listings */}
-        <div className={view === "grid"
-          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          : "space-y-3"
-        }>
+        <div
+          className={
+            view === "grid"
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              : "space-y-3"
+          }
+        >
           {filtered.map(l => (
             <div
               key={l.id}
@@ -198,13 +203,16 @@ export function SearchPage({ navigate }) {
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => navigate("messages")}
+                  onClick={() => navigate(`/messages/${l.id}`)}
                   className="flex-1 py-2 rounded-lg bg-purple-600/20 text-purple-400 text-xs font-semibold hover:bg-purple-600/30 transition-all"
                 >
                   💬 Message
                 </button>
 
-                <button className="flex-1 py-2 rounded-lg bg-gray-800 text-white text-xs font-semibold hover:bg-gray-700 transition-all">
+                <button
+                  onClick={() => navigate(`/profile/${l.id}`)}
+                  className="flex-1 py-2 rounded-lg bg-gray-800 text-white text-xs font-semibold hover:bg-gray-700 transition-all"
+                >
                   View Profile
                 </button>
               </div>

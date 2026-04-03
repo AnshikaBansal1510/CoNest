@@ -87,7 +87,7 @@ const App = () => {
       />
 
       <Route
-        path="/profile"
+        path="/profile/:id?"
         element={
           <ProtectedRoute>
             <AppLayout>
@@ -109,7 +109,7 @@ const App = () => {
       />
 
       <Route
-        path="/messages"
+        path="/messages/:id?"
         element={
           <ProtectedRoute>
             <AppLayout>
